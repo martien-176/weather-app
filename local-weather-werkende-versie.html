@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Weather</title>
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">   
+    
+<script>
+"use strict";
+
+$(document).ready(function(){
+			
+var apiKey = "933f5c3a937189c9f2fe89971d6ef200";
+var apiUrl = "";
+var lat = 0;
+var lon = 0;
+var unit = "metric";
+
+// Get position
+function success(pos) {
+  var crd = pos.coords;
+  lat = crd.latitude;
+  lon =  crd.longitude;
+  apiUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&units=" + unit + "&appid=" + apiKey;
+  console.log(apiUrl);
+  getWeather();
+};
+
+function error(err) {
+  console.warn('ERROR(' + err.code + '): ' + err.message);
+};
+
+navigator.geolocation.getCurrentPosition(success, error);
+// End get position
+
+
+// Get weather
+var getWeather = function() { 
+	$.getJSON(apiUrl,function(result){
+		var cTemp = Math.round(result.main.temp);
+		var descr = result.weather[0].description;
+		var icon = result.weather[0].icon + ".png";
+		var loc = result.name;
+		var fTemp = Math.round((cTemp * 9 / 5) + 32);
+		console.log(cTemp);
+
+    $("#show-weather").html("Weather is: " + result.weather[0].description);
+    $("#weatherImg").html("<img src='http://openweathermap.org/img/w/" + icon + "' alt = ''>");
+    $("#show-temp").html("Temperature is: " + cTemp + " degrees Celsius");	
+    $("#location").html("Your location is: " + loc);
+
+
+//Toggle fahrenheit celsius
+    $('#toggleFahrCel').click(function() {
+	   if ($(this).val() == "fahrenheit") {
+		  $(this).val("celsius");
+		  $("#show-temp").html("Temperature is: " + cTemp + " Celsius");
+	   }
+	   else if ($(this).val() == "celsius") {
+		 $(this).val("fahrenheit");
+		 $("#show-temp").html("Temperature is: " + fTemp + " Fahrenheit");
+	   }
+});
+});
+};	// End get weather
+});	
+
+
+</script>
+  </head>
+  <body>	
+	<div id="show-weather"></div>
+    <div id="weatherImg"></div>
+    <div id="location"></div>
+    <button class="btn btn-default target" id="toggleFahrCel" value="celsius">Toggle Fahrenheit/Celsius</button>
+    <div id="show-temp"></div>
+  </body>
+</html>
